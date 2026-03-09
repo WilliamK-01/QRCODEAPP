@@ -114,7 +114,7 @@ export default function QRPage() {
           </button>
         </div>
         <p className="text-xs text-gray-400 mt-6">
-          Card URL: {typeof window !== "undefined" && cardId ? `${window.location.origin}/card/${cardId}` : ""}
+          Card URL: {cardId ? `${window.location.origin}/card/${cardId}` : ""}
         </p>
       </main>
     </div>

@@ -1,6 +1,19 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
+import Image from "next/image";
 import type { Metadata } from "next";
+
+/** Allow only http/https website URLs to prevent javascript: or data: injection. */
+function safeUrl(url: string | null): string | null {
+  if (!url) return null;
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol === "https:" || parsed.protocol === "http:") return url;
+  } catch {
+    // invalid URL
+  }
+  return null;
+}
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -27,10 +40,12 @@ export default async function PublicCardPage({ params }: Props) {
         {/* Header */}
         <div className="bg-indigo-600 px-6 py-8 text-center">
           {card.profileImage ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={card.profileImage}
+            <Image
+              src={safeUrl(card.profileImage) ?? ""}
               alt={card.name}
+              width={96}
+              height={96}
+              unoptimized
               className="w-24 h-24 rounded-full object-cover mx-auto mb-4 border-4 border-white"
             />
           ) : (
@@ -78,7 +93,7 @@ export default async function PublicCardPage({ params }: Props) {
           )}
           {card.website && (
             <a
-              href={card.website}
+              href={safeUrl(card.website) ?? "#"}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-3 w-full bg-gray-50 hover:bg-gray-100 rounded-xl px-4 py-3 transition"
